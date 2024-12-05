@@ -1,0 +1,11 @@
+version: "3.5"
+services:
+  frontend:
+    build:
+      context: .
+    container_name: stock-frontend
+    volumes:
+      - .:/app
+      - /app/node_modules
+    ports:
+      - "3000:3000"
