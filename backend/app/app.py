@@ -1,5 +1,6 @@
 from flask import Flask, request, jsonify
 from services.yahoo_api import yahoo_get_stock_data
+import pandas as pd
 
 app = Flask(__name__)
 
@@ -14,7 +15,8 @@ def get_stocks_info():
     if not (stock_index, start_date, end_date):
         return jsonify({"error": "REQUIRED parameters are missing from the API call"}), 400
     response = yahoo_get_stock_data(stock_index, start_date, end_date)
-    if not response:
+    if response is None or len(response) == 0:
         return jsonify({"error": "Data could not be retrieved"}), 404
 
-    return jsonify(response), 200
+    response = pd.DataFrame(response)
+    return response.to_json(orient="records"), 200
