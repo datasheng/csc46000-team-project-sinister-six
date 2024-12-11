@@ -1,6 +1,7 @@
 from flask import Flask, request, jsonify
 from services.yahoo_api import yahoo_get_stock_data, yahoo_by_period
 from services.supabase_api import store_data_sb
+from services.utils import process_stock_data
 import pandas as pd
 import requests
 
@@ -44,11 +45,12 @@ def get_stocks_past_year():
     if response is None or len(response) == 0:
         return jsonify({"error": "Data could not be retrieved"}), 404
     response = pd.DataFrame(response)
+    response.reset_index(inplace=True)
     return response.to_json(orient="records"), 200
 
 
 @app.route('/store_past_period', methods=['POST'])
-def store_past_year():
+def store_past_period():
     """
     retrieves the past year data from yfinance API then stores it into supabase
     input: stock symbol, period from current date
@@ -56,13 +58,32 @@ def store_past_year():
     """
     index = request.args.get('index')
     period = request.args.get('period')
-    url = f"{server_ip}/get_stocks_past_period?index={index}&period={period}"
-    response = requests.get(url)
-    if response.status_code == 200:
-        data = response.json()  # returned as a json
-        df = pd.read_json(data)
-        response = store_data_sb(df, index)
-        return jsonify(response), 200
-    else:
-        return jsonify({"error": f"Failed getting stock data from past period {period}"})
+    # Use index as table name if not provided
+    table_name = request.args.get('table', index)
 
+    if not (index and period):
+        return jsonify({"error": "Missing required parameters: index and period"}), 400
+
+    # Fetch data using yahoo_by_period
+    stock_data = yahoo_by_period(index, period)
+    if stock_data is None or stock_data.empty:
+        return jsonify({"error": f"No data found for index: {index} and period: {period}"}), 404
+
+    # Process stock data using utility function
+    try:
+        processed_data = process_stock_data(stock_data)
+    except Exception as e:
+        return jsonify({"error": f"Failed to process stock data: {str(e)}"}), 500
+
+    # # Store processed data in Supabase
+    try:
+        response = store_data_sb(processed_data, table_name)
+        if "error" in response:
+            return jsonify(response), 500
+        return jsonify(response), 200
+    except Exception as e:
+        return jsonify({"error": f"Failed to store data in Supabase: {str(e)}"}), 500
+
+
+if __name__ == "__main__":
+    app.run(debug=True)
