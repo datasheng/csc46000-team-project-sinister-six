@@ -2,8 +2,10 @@ import yfinance as yf
 
 
 def yahoo_get_stock_data(symbol, start_date, end_date):
-    # ALL stock data between start_date and end_date
-    # returns just attributes Open price, Close price, and volume
+    """
+    input: stock symbol/index, start_date, end_date (in YYYY-MM-DD format)
+    output: Open Price, Close Price & Volume for that index
+    """
     try:
         ticker = yf.Ticker(symbol)
         history = ticker.history(start=start_date, end=end_date)
@@ -13,10 +15,16 @@ def yahoo_get_stock_data(symbol, start_date, end_date):
         print(f"Error fetching data from yfinance API: {e}")
         return None
 
-def yahoo_past_year(symbol):
+
+def yahoo_by_period(symbol, period):
+    """
+    input: stock symbol, period
+    output: Open Price, Close Price, Volume in the past period or interval (from current date)
+    example func call: yahoo_by_period('SPY', '1y')
+    """
     try:
         ticker = yf.Ticker(symbol)
-        history = ticker.history(period='1y', interval='1d')
+        history = ticker.history(period=period, interval='1d')
         data = history[['Open', 'Close', 'Volume']]
         return data
     except Exception as e:
