@@ -71,7 +71,7 @@ def store_data_sb(dataframe, table_name):
     create_table(table_name)
     input_data = dataframe.to_dict(orient="records")
     try:
-        response = supabase.table(table_name).insert(input_data).execute()
+        response = supabase.table(table_name.lower()).insert(input_data).execute()
         print(f"Supabase api response: {response}")
         return response
     except Exception as e:
