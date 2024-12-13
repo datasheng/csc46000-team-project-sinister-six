@@ -8,10 +8,8 @@ def process_stock_data(data):
     :param data: Pandas DataFrame
     :return: Processed Pandas DataFrame
     """
-    # Reset index
     data.reset_index(inplace=True)
 
-    # Rename columns to match Supabase schema
     data.rename(columns={
         "Date": "date",
         "Open": "open",
@@ -19,7 +17,6 @@ def process_stock_data(data):
         "Volume": "volume"
     }, inplace=True)
 
-    # Convert UNIX timestamp to datetime and format as 'YYYY-MM-DD'
     data["date"] = pd.to_datetime(
         data["date"], unit="ms").dt.strftime('%Y-%m-%d')
 

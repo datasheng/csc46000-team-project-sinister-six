@@ -58,26 +58,20 @@ def store_past_period():
     """
     index = request.args.get('index')
     period = request.args.get('period')
-    # Use index as table name if not provided
-    table_name = request.args.get('table', index)
-
     if not (index and period):
         return jsonify({"error": "Missing required parameters: index and period"}), 400
 
-    # Fetch data using yahoo_by_period
     stock_data = yahoo_by_period(index, period)
     if stock_data is None or stock_data.empty:
         return jsonify({"error": f"No data found for index: {index} and period: {period}"}), 404
 
-    # Process stock data using utility function
     try:
         processed_data = process_stock_data(stock_data)
     except Exception as e:
         return jsonify({"error": f"Failed to process stock data: {str(e)}"}), 500
 
-    # # Store processed data in Supabase
     try:
-        response = store_data_sb(processed_data, table_name)
+        response = store_data_sb(processed_data, index)
         if "error" in response:
             return jsonify(response), 500
         return jsonify(response), 200
@@ -87,3 +81,7 @@ def store_past_period():
 
 if __name__ == "__main__":
     app.run(debug=True)
+
+"""
+options for 'period' parameter: 1d, 5d, 1mo, 3mo, 6mo, 1y, 2y, 5y, 10y, ytd, max
+"""

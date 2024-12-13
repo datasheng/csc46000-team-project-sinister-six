@@ -6,8 +6,6 @@ import psycopg2
 from psycopg2 import sql
 
 load_dotenv()
-
-# right now considered empty in .env; awaiting info on this & key
 url: str = os.getenv("SUPABASE_URL")
 key: str = os.getenv("SUPABASE_KEY")
 db: str = os.getenv("DATABASE_URL")
@@ -24,12 +22,11 @@ supabase: Client = create_client(url, key)
 
 def execute_sql(query):
     """
-    Execute a raw SQL query on the Supabase database.
+    connects to postgresql -> executes given query -> closes connection
     :param query: SQL query as a string
     :return: None
     """
     try:
-        # Connect to the PostgreSQL database
         conn = psycopg2.connect(db)
         cursor = conn.cursor()
         cursor.execute(query)
@@ -43,6 +40,7 @@ def execute_sql(query):
 def create_table(table_name):
     """
     Creates a table in Supabase with a predefined schema.
+    if table already exists, nothing happens pretty much
     :param table_name: Table name
     """
     create_table_query = f"""
@@ -54,47 +52,31 @@ def create_table(table_name):
         volume FLOAT8
     );
     """
-    execute_sql(create_table_query)
+    try:
+        execute_sql(create_table_query)
+    except Exception as e:
+        print("Couldn't create table")
+        return {"error": f"Failed to create table '{table_name}': {str(e)}"}
 
 
 def store_data_sb(dataframe, table_name):
-    # """
-    # inputs: dataframe (pandas DF), table_name in supabase
-    # output: returns the response from API after storing/insert procedure
-    # """
-    # input_data = dataframe.to_dict(orient="records")
-    # response = supabase.table(table_name).insert(input_data).execute()
-    # if response.get("error"):
-    #     print(f"Error: {response.get('error')}")
-    # return response
     """
-    Creates a new table in Supabase (if not exists) and stores the provided DataFrame.
-    :param dataframe: Pandas DataFrame to store
-    :param table_name: Name of the table to create and store data into
-    :return: Response from Supabase API
+    ensures table is created/exists -> stores dataframe into table
+    inputs: dataframe (pandas DF)
+            table_name: table name in supabase
+    output: returns the response from API after storing/insert procedure
     """
     if dataframe.empty:
         return {"error": "The dataframe is empty. No data to store."}
-
-    try:
-        # Call the separate function for table creation
-        create_table(table_name)
-    except Exception as e:
-        return {"error": f"Failed to create table '{table_name}': {str(e)}"}
-
+    create_table(table_name)
     input_data = dataframe.to_dict(orient="records")
-
-    # try:
-    #     response = supabase.table(table_name).insert(input_data).execute()
-    #     if "error" in response:
-    #         return {"error": response.get("error")}
-    #     return {"status": "success", "data": response.get("data")}
-    # except Exception as e:
-    #     return {"error": f"Failed to insert data into table '{table_name}': {str(e)}"}
-    response = supabase.table(table_name).insert(input_data).execute()
-    if response.get("error"):
-        print(f"Error: {response.get('error')}")
-    return response
+    try:
+        response = supabase.table(table_name).insert(input_data).execute()
+        print(f"Supabase api response: {response}")
+        return response
+    except Exception as e:
+        print(f"Failed to insert into table '{table_name}': {str(e)}")
+        return {"error": f"Failed inserting into table '{table_name}': {str(e)}"}
 
 
 def get_data_sb(table_name):
