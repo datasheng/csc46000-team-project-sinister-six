@@ -1,6 +1,6 @@
 from flask import Flask, request, jsonify
 from services.yahoo_api import yahoo_get_stock_data, yahoo_by_period
-from services.supabase_api import store_data_sb
+from services.supabase_api import store_data_sb, get_data_all_sb
 from services.utils import process_stock_data
 import pandas as pd
 import requests
@@ -12,6 +12,7 @@ server_ip = 'http://localhost:5000'
 @app.route('/get_stocks', methods=['GET'])
 def get_stocks_info():
     """
+    USES: yahoo_get_stocks_data()
     inputs: index, start, end (stock symbol/index, start date, end date)
     output: returns json of stock data, previously converted to dataframe format also
     example of api call:
@@ -31,9 +32,28 @@ def get_stocks_info():
     return response.to_json(orient="records"), 200
 
 
+@app.route('/get_stocks_db', methods=['GET'])
+def get_stocks_db():
+    """
+    USES: get_data_all_sb()
+    gets stock data from postgres/supabase backend.
+    currently only supports retrieving entire table data. will add option to set a range
+    input: stock symbol
+           (optional): start date
+           (optional): end date
+    output:
+    """
+    stock_index = request.args.get('index')
+    if not stock_index:
+        return jsonify({"error": "REQUIRED parameters are missing from the API call"}), 400
+    response = get_data_all_sb(stock_index.lower())
+    return jsonify(response), 200
+
+
 @app.route('/get_stocks_past_period', methods=['GET'])
 def get_stocks_past_year():
     """
+    USES: yahoo_by_period()
     input: stock symbol, period from current date
     output: json format of stock symbol's data in the past year
     """
@@ -52,6 +72,7 @@ def get_stocks_past_year():
 @app.route('/store_past_period', methods=['POST'])
 def store_past_period():
     """
+    USES: yahoo_by_period(), process_stock_data(), store_data_sb()
     retrieves the past year data from yfinance API then stores it into supabase
     input: stock symbol, period from current date
     output: response or status

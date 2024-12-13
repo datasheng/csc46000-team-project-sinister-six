@@ -13,9 +13,7 @@ db: str = os.getenv("DATABASE_URL")
 supabase: Client = create_client(url, key)
 
 # TODO:
-# need .env info: URL & KEY @Tajwar
 # perhaps stored procedures either in codebase or internally in supabase for:
-# - storing dataframes into supabase
 # - retrieving data from supabase, to be used for tableau implementation
 # - retrieving data from supabase, but to be used locally for sklearn or building regression models in general
 
@@ -79,12 +77,14 @@ def store_data_sb(dataframe, table_name):
         return {"error": f"Failed inserting into table '{table_name}': {str(e)}"}
 
 
-def get_data_sb(table_name):
+def get_data_all_sb(table_name):
     """
     input: table_name. examples: SPY, VOO, AAPL (stock symbol and table name treated as interchangeable)
     output: table data as a dataframe
     """
-    response = supabase.table(table_name).select("*").execute()
-    df = pd.read_json(response)
-    print("dataframe: ", df)
-    return df
+    try:
+        response = supabase.table(table_name.lower()).select("*").execute()
+        data = response.data
+        return data
+    except Exception as e:
+        return {"error getting data from Supabase": str(e)}
