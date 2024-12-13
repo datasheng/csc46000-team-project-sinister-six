@@ -71,10 +71,11 @@ def store_data_sb(dataframe, table_name):
     create_table(table_name)
     input_data = dataframe.to_dict(orient="records")
     try:
-        response = supabase.table(table_name.lower()).insert(input_data).execute()
+        response = supabase.table(table_name.lower()).upsert(input_data, ignore_duplicates=True).execute()
         return response
     except Exception as e:
-        print(f"Failed to insert into table '{table_name}': {str(e)}")
+        print(f"Failed to insert into table '{table_name}': {str(e)}. \n Make sure that the table exists or table "
+              f"name matches.")
         return {"error": f"Failed inserting into table '{table_name}': {str(e)}"}
 
 
