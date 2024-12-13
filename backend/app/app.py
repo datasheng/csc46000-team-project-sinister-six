@@ -74,7 +74,7 @@ def store_past_period():
         response = store_data_sb(processed_data, index)
         if "error" in response:
             return jsonify(response), 500
-        return jsonify(response), 200
+        return jsonify(response.data), 200
     except Exception as e:
         return jsonify({"error": f"Failed to store data in Supabase: {str(e)}"}), 500
 
