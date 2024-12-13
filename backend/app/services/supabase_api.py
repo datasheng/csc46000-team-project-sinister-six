@@ -86,8 +86,6 @@ def get_data_all_sb(table_name, start_date="1900-01-01", end_date=None):
     try:
         if end_date is None:
             end_date = datetime.today().strftime("%Y-%m-%d")
-            print(end_date)
-        print(start_date)
         response = supabase.table(table_name.lower()).select("*").gte("date", start_date).lte("date", end_date).execute()
         data = response.data
         return data
