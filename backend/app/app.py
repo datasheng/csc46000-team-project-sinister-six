@@ -44,10 +44,19 @@ def get_stocks_db():
     output:
     """
     stock_index = request.args.get('index')
+    start_date = request.args.get('start')
+    end_date = request.args.get('end')
     if not stock_index:
         return jsonify({"error": "REQUIRED parameters are missing from the API call"}), 400
-    response = get_data_all_sb(stock_index.lower())
-    return jsonify(response), 200
+    if not start_date and not end_date:  # retrieve all from DB, no time range
+        response = get_data_all_sb(stock_index.lower())
+        return jsonify(response), 200
+    elif start_date and not end_date:
+        response = get_data_all_sb(stock_index.lower(), start_date)
+        return jsonify(response), 200
+    else:  # retrieve based on time range
+        response = get_data_all_sb(stock_index.lower(), start_date, end_date)
+        return jsonify(response), 200
 
 
 @app.route('/get_stocks_past_period', methods=['GET'])

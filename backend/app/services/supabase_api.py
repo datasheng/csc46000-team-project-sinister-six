@@ -4,6 +4,7 @@ from dotenv import load_dotenv
 import pandas as pd
 import psycopg2
 from psycopg2 import sql
+from datetime import datetime
 
 load_dotenv()
 url: str = os.getenv("SUPABASE_URL")
@@ -77,13 +78,17 @@ def store_data_sb(dataframe, table_name):
         return {"error": f"Failed inserting into table '{table_name}': {str(e)}"}
 
 
-def get_data_all_sb(table_name):
+def get_data_all_sb(table_name, start_date="1900-01-01", end_date=None):
     """
     input: table_name. examples: SPY, VOO, AAPL (stock symbol and table name treated as interchangeable)
     output: table data as a dataframe
     """
     try:
-        response = supabase.table(table_name.lower()).select("*").execute()
+        if end_date is None:
+            end_date = datetime.today().strftime("%Y-%m-%d")
+            print(end_date)
+        print(start_date)
+        response = supabase.table(table_name.lower()).select("*").gte("date", start_date).lte("date", end_date).execute()
         data = response.data
         return data
     except Exception as e:
