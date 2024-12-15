@@ -3,7 +3,7 @@ from supabase import create_client, Client
 from dotenv import load_dotenv
 import psycopg2
 from datetime import datetime
-from chroma_langchain import vector_store, build_rag_chain
+from .chroma_langchain_api import vector_store, build_rag_chain
 
 load_dotenv()
 url: str = os.getenv("SUPABASE_URL")

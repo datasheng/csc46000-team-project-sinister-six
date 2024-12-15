@@ -1,6 +1,6 @@
 from flask import Flask, request, jsonify
 from services.yahoo_api import yahoo_get_stock_data, yahoo_by_period
-from services.supabase_api import store_data_sb, get_data_all_sb
+from services.supabase_api import store_data_sb, get_data_all_sb, query_llm_data
 from services.utils import process_stock_data
 import pandas as pd
 import requests
@@ -107,6 +107,22 @@ def store_past_period():
         return jsonify(response.data), 200
     except Exception as e:
         return jsonify({"error": f"Failed to store data in Supabase: {str(e)}"}), 500
+
+
+@app.route('/query_llm', methods=['GET'])
+def query_llm():
+    """
+    input: query, stock index
+    note, you need to provide a stock symbol somehow (maybe from user input), for efficiency
+    output: LLM response
+    """
+    query = request.args.get('query')
+    stock_index = request.args.get('index')
+    try:
+        response = query_llm_data(query, stock_index)
+        return jsonify(response), 200
+    except Exception as e:
+        return jsonify({"failed querying llm": str(e)}), 500
 
 
 if __name__ == "__main__":
