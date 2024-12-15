@@ -11,13 +11,10 @@ def process_stock_data(data):
     data.reset_index(inplace=True)
 
     data.rename(columns={
-        "Date": "date",
-        "Open": "open",
-        "Close": "close",
-        "Volume": "volume"
+        "Close": "Close/Last",
     }, inplace=True)
 
-    data["date"] = pd.to_datetime(
-        data["date"], unit="ms").dt.strftime('%Y-%m-%d')
+    data["Date"] = pd.to_datetime(
+        data["Date"], unit="ms").dt.strftime('%Y-%m-%d')
 
     return data
