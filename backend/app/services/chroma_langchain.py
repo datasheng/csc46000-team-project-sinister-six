@@ -20,13 +20,13 @@ db = Chroma(
         )
 retriever = db.as_retriever(
             search_type="similarity_score_threshold",
-            search_kwargs={"k": 2, "score_threshold": 0.2},
+            search_kwargs={"k": 2, "score_threshold": 0.05},
         )
 server_ip = 'http://localhost:5000'
 
 def vector_store(table_name):
     try:
-        search_query = f"{table_name}"
+        search_query = f"Stock Name: {table_name}"
         search_results = retriever.invoke(search_query)
         if search_results:
             print("data found, no need for vector store!")

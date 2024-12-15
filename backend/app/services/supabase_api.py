@@ -112,4 +112,4 @@ def query_llm_data(query, table_name):
 
 
 if __name__ == "__main__":
-    query_llm_data("Tell me about your data on the stock voo", 'voo')
+    query_llm_data("What do you know about Voo's stock data?", 'voo')
