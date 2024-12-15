@@ -1,5 +1,5 @@
 from flask import Flask, request, jsonify
-from services.yahoo_api import yahoo_get_stock_data, yahoo_by_period
+from services.yahoo_api import yahoo_get_stock_data, yahoo_by_period, yahoo_get_additional_data, get_quote_table
 from services.supabase_api import store_data_sb, get_data_all_sb
 from services.utils import process_stock_data
 import pandas as pd
@@ -31,6 +31,48 @@ def get_stocks_info():
     response = pd.DataFrame(response)
     return response.to_json(orient="records"), 200
 
+@app.route('/get_full_stock_data', methods=['GET'])
+def get_full_stock_data():
+    """
+    Combine historical data with additional metrics from Yahoo Finance.
+    """
+    stock_index = request.args.get('index')
+    start_date = request.args.get('start')
+    end_date = request.args.get('end')
+
+    if not (stock_index and start_date and end_date):
+        return jsonify({"error": "REQUIRED parameters are missing from the API call"}), 400
+
+    # Get historical stock data
+    historical_data = yahoo_get_stock_data(stock_index, start_date, end_date)
+    if historical_data is None or historical_data.empty:
+        return jsonify({"error": "Historical data could not be retrieved"}), 404
+
+    # Get additional stock metrics
+    additional_data = yahoo_get_additional_data(stock_index)
+    if additional_data is None:
+        return jsonify({"error": "Additional data could not be retrieved"}), 404
+
+    return jsonify({
+        "historical_data": historical_data.to_dict(orient="records"),
+        "additional_data": additional_data
+    }), 200
+
+@app.route('/get_quote_table', methods=['GET'])
+def get_quote_table_data():
+    """
+    Fetch quote table data for a given stock symbol.
+    """
+    stock_index = request.args.get('index')
+
+    if not stock_index:
+        return jsonify({"error": "REQUIRED parameter 'index' is missing"}), 400
+
+    quote_data = get_quote_table(stock_index)
+    if quote_data is None:
+        return jsonify({"error": "Quote table data could not be retrieved"}), 404
+
+    return jsonify(quote_data), 200
 
 @app.route('/get_stocks_db', methods=['GET'])
 def get_stocks_db():

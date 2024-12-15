@@ -15,6 +15,65 @@ def yahoo_get_stock_data(symbol, start_date, end_date):
         print(f"Error fetching data from yfinance API: {e}")
         return None
 
+def yahoo_get_additional_data(symbol):
+    """
+    Retrieve more comprehensive data for a stock symbol.
+    """
+    try:
+        ticker = yf.Ticker(symbol)
+        info = ticker.info
+        return {
+            "longName": info.get("longName"),
+            "sector": info.get("sector"),
+            "industry": info.get("industry"),
+            "marketCap": info.get("marketCap"),
+            "priceToEarningsRatio": info.get("trailingPE"),
+            "forwardPE": info.get("forwardPE"),
+            "earningsPerShare": info.get("trailingEps"),
+            "beta": info.get("beta"),
+            "dividendYield": info.get("dividendYield"),
+            "targetMeanPrice": info.get("targetMeanPrice"),
+            "bookValue": info.get("bookValue"),
+            "priceToBook": info.get("priceToBook"),
+            "revenue": info.get("totalRevenue"),
+            "grossProfit": info.get("grossProfits"),
+            "operatingIncome": info.get("operatingIncome"),
+            "totalDebt": info.get("totalDebt"),
+            "freeCashFlow": info.get("freeCashflow")
+        }
+    except Exception as e:
+        print(f"Error fetching additional data from yfinance: {e}")
+        return None
+        
+def get_quote_table(symbol):
+    """
+    Fetch quote table data for a given stock symbol.
+    """
+    try:
+        ticker = yf.Ticker(symbol)
+        # The `info` attribute contains the quote table and more
+        info = ticker.info
+
+        # Extract commonly used quote table fields
+        quote_data = {
+            "symbol": symbol,
+            "ask": info.get("ask"),
+            "bid": info.get("bid"),
+            "dayHigh": info.get("dayHigh"),
+            "dayLow": info.get("dayLow"),
+            "fiftyTwoWeekHigh": info.get("fiftyTwoWeekHigh"),
+            "fiftyTwoWeekLow": info.get("fiftyTwoWeekLow"),
+            "previousClose": info.get("previousClose"),
+            "currentPrice": info.get("regularMarketPrice"),
+            "open": info.get("open"),
+            "volume": info.get("volume"),
+            "marketCap": info.get("marketCap"),
+            "beta": info.get("beta"),
+        }
+        return quote_data
+    except Exception as e:
+        print(f"Error fetching quote table data: {e}")
+        return None
 
 def yahoo_by_period(symbol, period):
     """
