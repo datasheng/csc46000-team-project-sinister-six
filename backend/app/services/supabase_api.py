@@ -1,18 +1,15 @@
 import os
 from supabase import create_client, Client
 from dotenv import load_dotenv
-import pandas as pd
 import psycopg2
-from psycopg2 import sql
 from datetime import datetime
+from .chroma_langchain_api import vector_store, build_rag_chain
 
 load_dotenv()
 url: str = os.getenv("SUPABASE_URL")
 key: str = os.getenv("SUPABASE_KEY")
 db: str = os.getenv("DATABASE_URL")
-
 supabase: Client = create_client(url, key)
-
 # TODO:
 # perhaps stored procedures either in codebase or internally in supabase for:
 # - retrieving data from supabase, to be used for tableau implementation
@@ -86,8 +83,33 @@ def get_data_all_sb(table_name, start_date="1900-01-01", end_date=None):
     try:
         if end_date is None:
             end_date = datetime.today().strftime("%Y-%m-%d")
-        response = supabase.table(table_name.lower()).select("*").gte("date", start_date).lte("date", end_date).execute()
+        response = supabase.table(table_name.lower()).select("*").gte("Date", start_date).lte("Date", end_date).execute()
         data = response.data
         return data
     except Exception as e:
         return {"error getting data from Supabase": str(e)}
+
+
+def query_llm_data(query, table_name):
+    """
+    currently, this just gives you an LLM response and analysis based on the data that's
+    already stored in postgresql. somehow just need the table name as input to get this correctly
+    input: query, table_name
+    output: LLM response
+    """
+    store = vector_store(table_name)
+    if store:
+        print("successful vector store")
+        print("building rag chain")
+        rag_chain = build_rag_chain()
+        history = []
+        result = rag_chain.invoke({"input": query, "chat_history": history})
+        answer = result.get("answer", "No response available")
+        print(answer)
+        return answer
+    else:
+        return "Problem querying LLM"
+
+
+if __name__ == "__main__":
+    query_llm_data("What do you know about Voo's stock data?", 'voo')
