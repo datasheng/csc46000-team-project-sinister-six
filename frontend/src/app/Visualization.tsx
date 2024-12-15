@@ -18,11 +18,11 @@ declare global {
 }
 
 interface VizualizationProps {
-  src: string; // Tableau visualization URL
-  width?: string; // Width of the visualization (default: '100%')
-  height?: string; // Height of the visualization (default: '500px')
-  hideTabs?: boolean; // Whether to hide the tabs (default: true)
-  toolbar?: "top" | "bottom"; // Toolbar position (default: 'bottom')
+  src: string;
+  width?: string;
+  height?: string;
+  hideTabs?: boolean;
+  toolbar?: "top" | "bottom";
 }
 
 const Visualization: React.FC<VizualizationProps> = ({
@@ -40,7 +40,6 @@ const Visualization: React.FC<VizualizationProps> = ({
     script.async = true;
     document.body.appendChild(script);
 
-    // Cleanup the script when the component unmounts
     return () => {
       document.body.removeChild(script);
     };
