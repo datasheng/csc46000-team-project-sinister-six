@@ -1,0 +1,13 @@
+version: "3.8"
+
+services:
+  flask-app:
+    build: .
+    ports:
+      - "5000:5000" # Expose the app on port 5000
+    environment:
+      - FLASK_APP=app.py
+      - FLASK_RUN_HOST=0.0.0.0
+    volumes:
+      - .:/app # Mount the current directory into the container for live code updates
+    restart: always # Optionally restart the container if it fails
