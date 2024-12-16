@@ -4,9 +4,12 @@ from services.supabase_api import store_data_sb, get_data_all_sb, query_llm_data
 from services.utils import process_stock_data
 import pandas as pd
 import requests
+from flask_cors import CORS
+
 
 app = Flask(__name__)
 server_ip = 'http://localhost:5000'
+CORS(app, origins=["http://localhost:3000","http://127.0.0.1:3000"])
 
 
 @app.route('/get_stocks', methods=['GET'])
