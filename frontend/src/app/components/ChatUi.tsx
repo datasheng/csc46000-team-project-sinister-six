@@ -1,9 +1,11 @@
 "use client";
 import { useState, ChangeEvent } from "react";
+import { v4 as uuidv4 } from "uuid";
 
 type Msg = {
   author: string;
   message: string;
+  key: string;
 };
 
 function ChatUi() {
@@ -23,16 +25,15 @@ function ChatUi() {
       {
         author: "Me",
         message: query,
+        key: uuidv4(),
       },
     ]);
-
     setLoading(true);
-
     try {
       const res = await fetch(
         getNews
-          ? `http://127.0.0.1:5000/query_llm?query=${query}`
-          : `http://127.0.0.1:5000//query_llm_news?query=${query}index=${index}`,
+          ? `http://127.0.0.1:5000/query_llm_news?query=${query}&index=${index}`
+          : `http://127.0.0.1:5000/query_llm?query=${query}`,
         {
           method: "GET",
           headers: {
@@ -42,7 +43,6 @@ function ChatUi() {
       );
       setQuery("");
       setIndex("");
-
       if (res.status !== 200) {
         console.error("There was an error while handling the request");
       }
@@ -54,6 +54,7 @@ function ChatUi() {
           {
             author: "LLM",
             message: data,
+            key: uuidv4(),
           },
         ]);
       }
@@ -111,7 +112,7 @@ function ChatUi() {
         <div className="flex items-start justify-start flex-col w-[900px] ">
           {response.map((res) => {
             return (
-              <h1 className="pt-6" key={res.message}>
+              <h1 className="pt-6" key={res.key}>
                 <span className="text-[20px]  font-bold underline">
                   {res.author}
                 </span>
