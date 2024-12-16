@@ -12,7 +12,7 @@ def get_company_news(symbol, start, end):
     inputs: stock symbol, start date, end date (YYYY-MM-DD)
     output: json format response
     keys: category, datetime, headline, id, image, related, source, summary, url
-    we will most likely use: headline, image, source, summary, url
+    we will most likely use: headline, image, source, summary, url, related
     """
     company_news = finnhub_client.company_news(symbol, _from=start, to=end)
     return company_news
