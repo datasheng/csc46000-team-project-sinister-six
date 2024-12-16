@@ -2,6 +2,8 @@ from flask import Flask, request, jsonify
 from services.yahoo_api import yahoo_get_stock_data, yahoo_by_period
 from services.supabase_api import store_data_sb, get_data_all_sb, query_llm_data
 from services.utils import process_stock_data
+from services.stocks_news_api import get_company_news, get_general_news
+from services.chroma_langchain_api import handle_llm_news
 import pandas as pd
 import requests
 from flask_cors import CORS
@@ -19,7 +21,7 @@ def get_stocks_info():
     inputs: index, start, end (stock symbol/index, start date, end date)
     output: returns json of stock data, previously converted to dataframe format also
     example of api call:
-    http://localhost:5000/stocks?index=SPY&start=2021-01-01&end=2021-12-31
+    http://localhost:5000/get_stocks?index=SPY&start=2021-01-01&end=2021-12-31
     note, sometimes people have different ports. take the one from your terminal/console log
     """
     stock_index = request.args.get('index')
@@ -126,6 +128,22 @@ def query_llm():
         return jsonify(response), 200
     except Exception as e:
         return jsonify({"failed querying llm": str(e)}), 500
+
+
+@app.route('/query_llm_news', methods=['GET'])
+def query_llm_news():
+    """
+    input: query, stock index
+    output: LLM response
+    key difference is simply that the LLM will specifically look for news in vector DB
+    """
+    query = request.args.get('query')
+    stock_index = request.args.get('index')
+    try:
+        response = handle_llm_news(query, stock_index)
+        return jsonify(response), 200
+    except Exception as e:
+        return jsonify({"failed querying llm for stock news": str(e)}), 500
 
 
 if __name__ == "__main__":
