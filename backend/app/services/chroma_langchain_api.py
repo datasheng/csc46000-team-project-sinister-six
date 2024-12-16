@@ -9,7 +9,7 @@ from langchain_community.document_loaders.csv_loader import CSVLoader
 from dotenv import load_dotenv
 from .stocks_news_api import get_company_news
 load_dotenv()
-CHROMA_PATH = "chroma"
+CHROMA_PATH = "../chroma"
 OPENAI_KEY = os.getenv("OPENAI_KEY")
 embed = OpenAIEmbeddings(
     api_key=OPENAI_KEY,
