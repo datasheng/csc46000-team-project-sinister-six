@@ -11,7 +11,7 @@ function ChatUi() {
   const [index, setIndex] = useState<string>("");
   const [getNews, setGetnews] = useState<boolean>(false);
   const [response, setResponse] = useState<Msg[]>([]);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState<boolean>(false);
 
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
