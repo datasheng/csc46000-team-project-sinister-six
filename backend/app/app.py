@@ -21,7 +21,7 @@ def get_stocks_info():
     inputs: index, start, end (stock symbol/index, start date, end date)
     output: returns json of stock data, previously converted to dataframe format also
     example of api call:
-    http://localhost:5000/stocks?index=SPY&start=2021-01-01&end=2021-12-31
+    http://localhost:5000/get_stocks?index=SPY&start=2021-01-01&end=2021-12-31
     note, sometimes people have different ports. take the one from your terminal/console log
     """
     stock_index = request.args.get('index')
