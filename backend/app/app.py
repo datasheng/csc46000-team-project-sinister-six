@@ -2,6 +2,7 @@ from flask import Flask, request, jsonify
 from services.yahoo_api import yahoo_get_stock_data, yahoo_by_period
 from services.supabase_api import store_data_sb, get_data_all_sb, query_llm_data
 from services.utils import process_stock_data
+from services.stocks_news_api import get_company_news, get_general_news
 import pandas as pd
 import requests
 from flask_cors import CORS

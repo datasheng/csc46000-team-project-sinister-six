@@ -36,14 +36,7 @@ def vector_store(table_name):
         else:
             print("Data not found. need to vector store")
         try:
-            response = requests.get(f"{server_ip}/get_stocks_db?index={table_name}")
-            data = response.json()
-            print("data retrieved from API successfully. ")
-            os.makedirs("./data", exist_ok=True)
-            df = pd.DataFrame(data)
-            df.to_csv(csv_path, index=False)
-            print(f"data saved to CSV: {csv_path}")
-
+            postgres_to_csv(table_name, csv_path)
             loader = CSVLoader(file_path=csv_path)
             documents = loader.load()
 
@@ -56,6 +49,17 @@ def vector_store(table_name):
             print("encountered an error when sending request: ", str(e))
     except requests.exceptions.RequestException as e:
         return False
+
+
+def postgres_to_csv(table_name, csv_path):
+    response = requests.get(f"{server_ip}/get_stocks_db?index={table_name}")
+    data = response.json()
+    print("data retrieved from API successfully. ")
+    os.makedirs("./data", exist_ok=True)
+    df = pd.DataFrame(data)
+    df.to_csv(csv_path, index=False)
+    print(f"data saved to CSV: {csv_path}")
+
 
 def build_rag_chain():
     model = ChatOpenAI(
