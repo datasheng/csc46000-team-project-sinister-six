@@ -5,34 +5,34 @@ const visPairs = [
   {
     vooTitle: "VOOTimeseries",
     rspTitle: "RSPTimeseries",
-    conclusion: "put a conclusion here",
+    conclusion: "Over the 10-year period, VOO demonstrates a relatively stable upward trajectory compared to RSP, which exhibits more pronounced fluctuations. VOO is likely to maintain consistent growth due to its lower volatility, while RSP may continue its trend of higher risk and reward dynamics.",
   },
   {
     vooTitle: "VOOLinearRegression",
     rspTitle: "RSPLinearRegression",
-    conclusion: "put a conclusion here",
+    conclusion: "The linear regression for VOO indicates a steady growth trend with a higher slope than RSP, which shows slower, less consistent growth. VOO is expected to outperform RSP in long-term growth, assuming market conditions remain similar.",
   },
   {
     vooTitle: "VOOVolumeByDate",
     rspTitle: "RSPVolumebyDate",
-    conclusion: "put a conclusion here",
+    conclusion: "Trading volumes for both RSP and VOO show periodic spikes, with RSP experiencing higher volume variability compared to VOO's more stable volume trend. VOO's stable volume suggests continued investor confidence, while RSP's volume spikes could indicate speculative interest, leading to greater price swings.",
   },
   {
     vooTitle: "VOO7DayMovingAverage",
     rspTitle: "RSP7DayMovingAverage",
-    conclusion: "put a conclusion here",
+    conclusion: "The 7-day moving average for VOO shows smoother and more predictable trends, while RSP displays greater short-term volatility. VOO is likely to provide a steadier investment performance, whereas RSP might offer short-term opportunities for active traders due to its higher volatility.",
   },
   {
     vooTitle: "VOO30DayMovingAverage",
     rspTitle: "RSP30DayMovingAverage",
-    conclusion: "put a conclusion here",
+    conclusion: "The 30-day moving average reinforces the consistency of VOO's performance over time, highlighting a gradual growth pattern. RSP, while showing more pronounced fluctuations, indicates potential opportunities for investors seeking higher risks with possible rewards.",
   },
 ];
 
 const combinedVis = [
   {
     title: "VOOvsRSPTimeseries",
-    conclusion: "put a conclusion here",
+    conclusion: "The dual-axis time series highlights VOO's steady and consistent upward trajectory, showcasing its resilience and reliability, whereas RSP demonstrates higher volatility with sharper peaks and troughs. This comparison suggests VOO is a safer long-term investment, while RSP offers opportunities for higher returns in shorter, more speculative windows.",
   },
 ];
 
